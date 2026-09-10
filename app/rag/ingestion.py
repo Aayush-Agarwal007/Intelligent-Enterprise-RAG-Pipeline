@@ -1,16 +1,34 @@
 import pymupdf
+
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from qdrant_client import QdrantClient
+from qdrant_client.models import PointStruct
+
+from ollama import embed
+
+
+QDRANT_URL = "http://127.0.0.1:6333"
+COLLECTION_NAME = "enterprise_documents"
+
+
+qdrant_client = QdrantClient(
+    url=QDRANT_URL
+)
 
 
 def load_pdf(file_path: str):
+
     document = pymupdf.open(file_path)
 
     pages = []
 
     for page_number, page in enumerate(document):
+
         text = page.get_text()
 
         if text.strip():
+
             pages.append({
                 "page": page_number + 1,
                 "text": text
@@ -22,6 +40,7 @@ def load_pdf(file_path: str):
 
 
 def split_documents(pages):
+
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=150
@@ -30,9 +49,11 @@ def split_documents(pages):
     chunks = []
 
     for page in pages:
+
         page_chunks = splitter.split_text(page["text"])
 
         for chunk in page_chunks:
+
             chunks.append({
                 "text": chunk,
                 "page": page["page"]
@@ -41,19 +62,35 @@ def split_documents(pages):
     return chunks
 
 
-if __name__ == "__main__":
+def store_chunks_in_qdrant(chunks, document_name):
 
-    pdf_path = "documents/RED_HAT.pdf"
+    points = []
 
-    pages = load_pdf(pdf_path)
+    for index, chunk in enumerate(chunks):
 
-    print("Pages extracted:", len(pages))
+        response = embed(
+            model="nomic-embed-text",
+            input=chunk["text"]
+        )
 
-    chunks = split_documents(pages)
+        embedding = response["embeddings"][0]
 
-    print("Total chunks:", len(chunks))
+        point = PointStruct(
+            id=str(uuid.uuid4()),
+            vector=embedding,
+            payload={
+                "text": chunk["text"],
+                "document_name": document_name,
+                "page": chunk["page"],
+                "chunk_id": index + 1
+            }
+        )
+        print("Chunks received by Qdrant:", len(chunks))
+        points.append(point)
 
-    for i, chunk in enumerate(chunks[:5]):
-        print(f"\n--- Chunk {i + 1} ---")
-        print("Page:", chunk["page"])
-        print(chunk["text"][:500])
+    qdrant_client.upsert(
+        collection_name=COLLECTION_NAME,
+        points=points
+    )
+
+    return len(points)

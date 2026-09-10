@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from api.documents import router as documents_router
 from rag.retrieval import search_documents
 from rag.generation import generate_answer
 
@@ -9,6 +9,7 @@ app = FastAPI(
     description="AI-Powered Enterprise Knowledge Assistant",
     version="1.0.0"
 )
+app.include_router(documents_router)
 
 
 @app.get("/health")

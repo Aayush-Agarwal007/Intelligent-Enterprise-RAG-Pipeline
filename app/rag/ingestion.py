@@ -1,4 +1,5 @@
 import pymupdf
+import uuid
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -63,6 +64,8 @@ def split_documents(pages):
 
 
 def store_chunks_in_qdrant(chunks, document_name):
+    document_id=str(uuid.uuid4())
+    print("Chunks Received by Qdrant:", len(chunks))
 
     points = []
 
@@ -81,6 +84,7 @@ def store_chunks_in_qdrant(chunks, document_name):
             payload={
                 "text": chunk["text"],
                 "document_name": document_name,
+                "document_id": document_id,
                 "page": chunk["page"],
                 "chunk_id": index + 1
             }

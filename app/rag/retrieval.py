@@ -8,7 +8,6 @@ qdrant_client = QdrantClient(
 
 COLLECTION_NAME = "enterprise_documents"
 
-
 def search_documents(question: str, limit: int = 7):
 
     # Convert question into embedding
@@ -23,7 +22,8 @@ def search_documents(question: str, limit: int = 7):
     results = qdrant_client.query_points(
         collection_name=COLLECTION_NAME,
         query=query_vector,
-        limit=limit
+        limit=limit,
+        score_threshold=0.40
     ).points
 
     return results

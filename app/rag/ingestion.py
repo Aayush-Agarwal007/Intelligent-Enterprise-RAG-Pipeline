@@ -14,7 +14,7 @@ COLLECTION_NAME = "enterprise_documents"
 
 
 qdrant_client = QdrantClient(
-    url=QDRANT_URL
+    url="http://127.0.0.1:6333"
 )
 
 
@@ -92,9 +92,15 @@ def store_chunks_in_qdrant(chunks, document_name):
         print("Chunks received by Qdrant:", len(chunks))
         points.append(point)
 
-    qdrant_client.upsert(
-        collection_name=COLLECTION_NAME,
-        points=points
-    )
+        print("Total chunks:", len(chunks))
+        print("Total Qdrant points:", len(points))
+
+        if not points:
+            raise ValueError("No points were created for Qdrant")
+
+        qdrant_client.upsert(
+            collection_name=COLLECTION_NAME,
+            points=points
+        )
 
     return len(points)

@@ -23,7 +23,7 @@ def search_documents(question: str, limit: int = 7):
         collection_name=COLLECTION_NAME,
         query=query_vector,
         limit=limit,
-        score_threshold=0.40
+        score_threshold=0.6
     ).points
 
     return results

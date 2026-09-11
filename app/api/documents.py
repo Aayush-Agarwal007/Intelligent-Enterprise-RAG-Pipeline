@@ -80,9 +80,17 @@ def list_documents():
 @router.delete("/{filename}")
 def delete_document(filename: str):
 
-    file_path = DOCUMENTS_DIR / filename
+    # Find the physical file using the original filename
+    matching_files = list(DOCUMENTS_DIR.glob(f"*_{filename}"))
 
-    if not file_path.exists():
+    # Also check for files without UUID prefix
+    direct_file = DOCUMENTS_DIR / filename
+
+    if direct_file.exists():
+        file_path = direct_file
+    elif matching_files:
+        file_path = matching_files[0]
+    else:
         raise HTTPException(
             status_code=404,
             detail="Document not found"
@@ -101,7 +109,7 @@ def delete_document(filename: str):
         )
     )
 
-    # Delete physical file
+    # Delete physical PDF
     file_path.unlink()
 
     return {

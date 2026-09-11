@@ -29,7 +29,15 @@ def ask_ai(question: str):
         limit=7
     )
 
-    # 2. Build context
+    # 2. Stop if no relevant document was found
+    if not results:
+        return {
+            "question": question,
+            "answer": "I could not find this information in the available documents.",
+            "sources": []
+        }
+
+    # 3. Build context
     context_parts = []
 
     for result in results:
@@ -45,23 +53,32 @@ Page: {result.payload["page"]}
 
     context = "\n\n".join(context_parts)
 
-    # 3. Generate answer
+    # 4. Generate answer
     answer = generate_answer(
         question,
         context
     )
 
-    # 4. Build sources
+    # 5. Build sources
     sources = []
+    seen_sources = set()
 
     for result in results:
 
-        sources.append({
-            "document": result.payload["document_name"],
-            "page": result.payload["page"],
-            "score": result.score
+        document = result.payload["document_name"]
+        page = result.payload["page"]
+
+        source_key = (document, page)
+
+        if source_key not in seen_sources:
+
+            sources.append({
+            "document": document,
+            "page": page,
+            "score": round(result.score, 4)
         })
 
+            seen_sources.add(source_key)
     return {
         "question": question,
         "answer": answer,

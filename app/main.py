@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from api.documents import router as documents_router
 from rag.retrieval import search_documents
 from rag.generation import generate_answer
-
+from rag.keyword_search import keyword_search
 
 app = FastAPI(
     title="Enterprise Knowledge Intelligence System",
@@ -27,6 +27,21 @@ def ask_ai(question: str):
     results = search_documents(
         question,
         limit=7
+    )
+    keyword_results = keyword_search(
+    question,
+    limit=7
+)
+
+    print("\nBM25 RESULTS:")
+    for result in keyword_results:
+        print(
+        "Score:",
+        result["score"],
+        "| Document:",
+        result["chunk"]["document_name"],
+        "| Page:",
+        result["chunk"]["page"]
     )
 
     # 2. Stop if no relevant document was found

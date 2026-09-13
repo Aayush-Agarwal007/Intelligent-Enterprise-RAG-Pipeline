@@ -1,7 +1,5 @@
 from qdrant_client import QdrantClient
 from ollama import embed
-
-
 qdrant_client = QdrantClient(
     url="http://127.0.0.1:6333"
 )

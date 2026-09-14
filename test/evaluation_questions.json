@@ -1,0 +1,52 @@
+[
+  {
+    "question": "What are Aayush's programming languages?",
+    "expected_document": "Amazon.pdf",
+    "expected_answer": "Python, Java, C++, SQL"
+  },
+  {
+    "question": "How many LeetCode problems has Aayush solved?",
+    "expected_document": "Amazon.pdf",
+    "expected_answer": "400+"
+  },
+  {
+    "question": "What is Aayush's CGPA?",
+    "expected_document": "Amazon.pdf",
+    "expected_answer": "9.43"
+  },
+  {
+  "question": "What machine learning projects has Aayush worked on?",
+  "expected_document": "Amazon.pdf",
+  "expected_answer": "ML Algorithms from Scratch using NumPy, Enterprise RAG AI Assistant, and Sentiment Analysis with Fine-Tuned DistilBERT"
+},
+{
+  "question": "What technologies were used in the Enterprise RAG AI Assistant?",
+  "expected_document": "Amazon.pdf",
+  "expected_answer": "Python, LangChain, FAISS, ChromaDB, Gemini/OpenAI API, Streamlit, and Vector Databases"
+},
+{
+  "question": "What are Aayush's core software engineering skills?",
+  "expected_document": "DEC_Developer.pdf",
+  "expected_answer": "Object-oriented design, DSA, iterative development, test-driven development, full-stack development, and clean code"
+},
+{
+  "question": "What technologies did Aayush use for the CryptocurrencyAnalyzer?",
+  "expected_document": "DEC_Developer.pdf",
+  "expected_answer": "Python, Flask, JavaScript, HTML, CSS, REST APIs, JSON, MySQL, SQLite, Chart.js, and Git"
+},
+{
+  "question": "What technologies were used in the Smart Travel Application?",
+  "expected_document": "DEC_Developer.pdf",
+  "expected_answer": "Flutter, Dart, Firebase, REST APIs, Google Maps API, Geolocation Services, and Git"
+},
+{
+  "question": "What are Aayush's core CS concepts?",
+  "expected_document": "DEC_Developer.pdf",
+  "expected_answer": "Data Structures and Algorithms, OOP, Object-Oriented Design, DBMS, Computer Networks, OS, and Complexity Analysis"
+},
+{
+  "question": "What leadership activities has Aayush participated in?",
+  "expected_document": "DEC_Developer.pdf",
+  "expected_answer": "Campus Executive at E-Cell IIT Bombay and Member of the Training Advisory Council"
+}
+]

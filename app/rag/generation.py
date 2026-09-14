@@ -22,8 +22,7 @@ IMPORTANT RULES:
 5. If the answer genuinely cannot be found in the CONTEXT, respond exactly:
    "I could not find this information in the available documents."
 6. Be concise and factual.
-7. At the end, provide the source document and page number.
-8. Never invent a document name or page number.
+7. Do not provide source names, page numbers, or citations.
 
 CONTEXT:
 {context}

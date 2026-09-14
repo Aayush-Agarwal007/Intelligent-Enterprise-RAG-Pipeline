@@ -1,3 +1,5 @@
+from unittest import result
+
 from fastapi import FastAPI
 from app.api.documents import router as documents_router
 from app.rag.retrieval import hybrid_search, retrieve_with_reranking
@@ -78,28 +80,30 @@ Page: {payload["page"]}
 
     # 5. Build sources
     sources = []
+
     seen_sources = set()
 
     for result in results:
-
         payload = result["payload"]
 
         document = payload["document_name"]
         page = payload["page"]
+        score = round(result["score"], 4)
 
         source_key = (document, page)
 
-        if source_key not in seen_sources:
+        if source_key in seen_sources:
+            continue
 
-            sources.append({
+        seen_sources.add(source_key)
+
+        sources.append({
             "document": document,
             "page": page,
-            "score": round(result["score"], 4)
-        })
-
-            seen_sources.add(source_key)
+            "score": score
+    })
     return {
         "question": question,
         "answer": answer,
         "sources": sources
-    }
+}

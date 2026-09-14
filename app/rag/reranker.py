@@ -42,10 +42,10 @@ def rerank_documents(question: str, results: list, limit: int = 5):
 )
 
 # Keep only reasonably relevant results
-    reranked = [
-        result
-        for result in reranked
-        if result["score"] > 0
-]
+#     reranked = [
+#         result
+#         for result in reranked
+#         if result["score"] > 0
+# ]
 
     return reranked[:limit]

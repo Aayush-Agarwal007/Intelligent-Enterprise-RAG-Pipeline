@@ -27,7 +27,7 @@ def search_documents(question: str, limit: int = 7):
         collection_name=COLLECTION_NAME,
         query=query_vector,
         limit=limit,
-        score_threshold=0.6
+        score_threshold=0.3
     ).points
 
     return results
@@ -166,11 +166,11 @@ def hybrid_search(question: str, limit: int = 7):
 )
 
 # Remove completely irrelevant results
-    results = [
-        result
-        for result in results
-        if result["score"] > 0
-]
+#     results = [
+#         result
+#         for result in results
+#         if result["score"] > 0
+# ]
 
     return results[:limit]
 def retrieve_with_reranking(question: str, limit: int = 5):

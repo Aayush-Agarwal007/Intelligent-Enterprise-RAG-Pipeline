@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from api.documents import router as documents_router
-from rag.retrieval import search_documents
-from rag.generation import generate_answer
-from rag.keyword_search import keyword_search
-
+from app.api.documents import router as documents_router
+from app.rag.retrieval import hybrid_search, retrieve_with_reranking
+from app.rag.generation import generate_answer
+from app.rag.keyword_search import keyword_search
+from app.rag.reranker import rerank_documents
 app = FastAPI(
     title="Enterprise Knowledge Intelligence System",
     description="AI-Powered Enterprise Knowledge Assistant",
@@ -24,9 +24,9 @@ def health_check():
 def ask_ai(question: str):
 
     # 1. Retrieve relevant documents
-    results = search_documents(
+    results = retrieve_with_reranking(
         question,
-        limit=7
+        limit=5
     )
     keyword_results = keyword_search(
     question,
@@ -57,14 +57,16 @@ def ask_ai(question: str):
 
     for result in results:
 
-        context_parts.append(
-            f"""
-Source: {result.payload["document_name"]}
-Page: {result.payload["page"]}
+        payload = result["payload"]
 
-{result.payload["text"]}
+        context_parts.append(
+    f"""
+Source: {payload["document_name"]}
+Page: {payload["page"]}
+
+{payload["text"]}
 """
-        )
+)       
 
     context = "\n\n".join(context_parts)
 
@@ -80,8 +82,10 @@ Page: {result.payload["page"]}
 
     for result in results:
 
-        document = result.payload["document_name"]
-        page = result.payload["page"]
+        payload = result["payload"]
+
+        document = payload["document_name"]
+        page = payload["page"]
 
         source_key = (document, page)
 
@@ -90,7 +94,7 @@ Page: {result.payload["page"]}
             sources.append({
             "document": document,
             "page": page,
-            "score": round(result.score, 4)
+            "score": round(result["score"], 4)
         })
 
             seen_sources.add(source_key)

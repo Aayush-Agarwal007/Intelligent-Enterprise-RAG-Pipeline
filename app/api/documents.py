@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File,HTTPException
 from pathlib import Path
 import uuid
-from rag.keyword_search import add_chunks
+from app.rag.keyword_search import add_chunks
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
@@ -9,7 +9,7 @@ qdrant_client = QdrantClient(
     url="http://127.0.0.1:6333"
 )
 COLLECTION_NAME="enterprise_documents"
-from rag.ingestion import (
+from app.rag.ingestion import (
     load_pdf,
     split_documents,
     store_chunks_in_qdrant

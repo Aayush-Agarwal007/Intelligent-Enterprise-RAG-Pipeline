@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File,HTTPException
 from pathlib import Path
 import uuid
 from app.rag.keyword_search import add_chunks
+from app.db.database import add_document
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
@@ -56,9 +57,12 @@ def upload_document(file: UploadFile = File(...)):
     chunks,
     file.filename
 )
+    document_id = add_document(file.filename)
+
     return {
     "message": "Document processed and indexed successfully",
     "filename": file.filename,
+    "document_id": document_id,
     "pages": len(pages),
     "chunks": len(chunks),
     "indexed_chunks": stored_chunks

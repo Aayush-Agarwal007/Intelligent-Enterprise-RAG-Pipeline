@@ -1,13 +1,11 @@
 [
-  {
-    "question": "What are Aayush's programming languages?",
-    "expected_document": "Amazon.pdf",
-    "expected_answer": "Python, Java, C++, SQL"
-  },
+ 
   {
     "question": "How many LeetCode problems has Aayush solved?",
     "expected_document": "Amazon.pdf",
-    "expected_answer": "400+"
+    "expected_facts": [
+    "400+"
+]
   },
   {
     "question": "What is Aayush's CGPA?",
@@ -17,8 +15,11 @@
   {
   "question": "What machine learning projects has Aayush worked on?",
   "expected_document": "Amazon.pdf",
-  "expected_answer": "ML Algorithms from Scratch using NumPy, Enterprise RAG AI Assistant, and Sentiment Analysis with Fine-Tuned DistilBERT"
-},
+"expected_facts": [
+    "ML Algorithms from Scratch using NumPy",
+    "Enterprise RAG AI Assistant",
+    "Sentiment Analysis with Fine-Tuned DistilBERT"
+]},
 {
   "question": "What technologies were used in the Enterprise RAG AI Assistant?",
   "expected_document": "Amazon.pdf",

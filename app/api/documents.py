@@ -2,8 +2,12 @@ from fastapi import APIRouter, UploadFile, File,HTTPException
 from pathlib import Path
 import uuid
 from app.rag.keyword_search import add_chunks as add_keyword_chunks
-
-from app.db.database import add_document, add_chunks as add_database_chunks
+from app.db.database import (
+    add_document,
+    add_chunks as add_database_chunks,
+    delete_document as delete_database_document,
+    get_document_id
+)
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
@@ -110,7 +114,7 @@ def delete_document(filename: str):
             status_code=404,
             detail="Document not found"
         )
-
+    document_id = get_document_id(filename)
     # Delete vectors from Qdrant
     qdrant_client.delete(
         collection_name=COLLECTION_NAME,
@@ -126,7 +130,9 @@ def delete_document(filename: str):
 
     # Delete physical PDF
     file_path.unlink()
-
+    # Delete PostgreSQL record
+    if document_id is not None:
+        delete_database_document(document_id)
     return {
         "message": "Document deleted successfully",
         "filename": filename

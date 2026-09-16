@@ -98,7 +98,41 @@ def create_chunks_table():
 
     conn.commit()
     conn.close()
+def delete_document(document_id: int):
+    conn = get_connection()
 
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            DELETE FROM documents
+            WHERE id = %s
+            """,
+            (document_id,)
+        )
+
+    conn.commit()
+    conn.close()
+def get_document_id(filename: str):
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT id
+            FROM documents
+            WHERE filename = %s
+            """,
+            (filename,)
+        )
+
+        result = cursor.fetchone()
+
+    conn.close()
+
+    if result is None:
+        return None
+
+    return result[0]
 
 if __name__ == "__main__":
     create_documents_table()

@@ -4,8 +4,11 @@ from ollama import chat
 MODEL_NAME = "qwen2.5:3b"
 
 
-def generate_answer(question: str, context: str):
-
+def generate_answer(
+    question: str,
+    context: str,
+    conversation_history: str = ""
+):
     prompt = f"""
 You are an enterprise knowledge assistant.
 
@@ -24,8 +27,12 @@ IMPORTANT RULES:
 6. Be concise and factual.
 7. Do not provide source names, page numbers, or citations.
 
+CONVERSATION HISTORY:
+{conversation_history}
 CONTEXT:
 {context}
+
+
 
 USER QUESTION:
 {question}

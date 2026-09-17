@@ -1,7 +1,8 @@
-from unittest import result
+# from unittest import result
 from app.rag.keyword_search import rebuild_bm25_index
 from fastapi import FastAPI
 from app.db.database import get_messages,add_message
+from app.db.database import create_conversation
 from app.api.documents import router as documents_router
 from app.rag.retrieval import hybrid_search, retrieve_with_reranking
 from app.rag.generation import generate_answer
@@ -26,11 +27,22 @@ def health_check():
         "message": "Enterprise Knowledge Intelligence System is running smoothly"
     }
 
+@app.post("/conversations")
+def create_new_conversation():
+    conversation_id = create_conversation()
 
+    return {
+        "conversation_id": conversation_id,
+        "title": "New Conversation"
+    }
 @app.get("/ask")
 def ask_ai(question: str, conversation_id: int):
         # Load previous conversation messages
     previous_messages = get_messages(conversation_id)
+    conversation_history = "\n".join(
+    f"{message[1]}: {message[2]}"
+    for message in previous_messages
+)
 
     print("\n========== CONVERSATION HISTORY ==========")
 
@@ -94,7 +106,8 @@ Page: {payload["page"]}
     # 4. Generate answer
     answer = generate_answer(
         question,
-        context
+        context,
+        conversation_history
     )
     # Save user question and AI answer
     add_message(

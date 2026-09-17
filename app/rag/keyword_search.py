@@ -1,15 +1,59 @@
 from rank_bm25 import BM25Okapi
 
+from app.db.database import get_connection
 
-# All chunks from uploaded documents
+
 all_chunks = []
-
-# BM25 index
 bm25_index = None
 
 
 def tokenize(text: str):
     return text.lower().split()
+
+
+def rebuild_bm25_index():
+    global all_chunks
+    global bm25_index
+
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT
+                c.text,
+                c.page,
+                d.filename
+            FROM chunks c
+            JOIN documents d
+                ON c.document_id = d.id
+            ORDER BY c.id
+            """
+        )
+
+        rows = cursor.fetchall()
+
+    conn.close()
+
+    all_chunks = []
+
+    for text, page, filename in rows:
+        all_chunks.append({
+            "text": text,
+            "page": page,
+            "document_name": filename
+        })
+
+    if not all_chunks:
+        bm25_index = None
+        return
+
+    tokenized_chunks = [
+        tokenize(chunk["text"])
+        for chunk in all_chunks
+    ]
+
+    bm25_index = BM25Okapi(tokenized_chunks)
 
 
 def add_chunks(chunks, document_name):
@@ -32,6 +76,7 @@ def add_chunks(chunks, document_name):
 
 
 def keyword_search(query: str, limit: int = 7):
+
     if bm25_index is None or not all_chunks:
         return []
 
@@ -55,9 +100,9 @@ def keyword_search(query: str, limit: int = 7):
             continue
 
         results.append({
-        "chunk": all_chunks[index],
-        "score": score
-    })
+            "chunk": all_chunks[index],
+            "score": score
+        })
 
         if len(results) >= limit:
             break

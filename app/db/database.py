@@ -98,6 +98,114 @@ def create_chunks_table():
 
     conn.commit()
     conn.close()
+def create_conversations_table():
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS conversations (
+                id SERIAL PRIMARY KEY,
+                title TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """
+        )
+
+    conn.commit()
+    conn.close()
+def create_messages_table():
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS messages (
+                id SERIAL PRIMARY KEY,
+                conversation_id INTEGER NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                CONSTRAINT fk_conversation
+                    FOREIGN KEY (conversation_id)
+                    REFERENCES conversations(id)
+                    ON DELETE CASCADE
+            )
+            """
+        )
+
+    conn.commit()
+    conn.close()
+def create_conversation(title: str = "New Conversation"):
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            INSERT INTO conversations (title)
+            VALUES (%s)
+            RETURNING id
+            """,
+            (title,)
+        )
+
+        conversation_id = cursor.fetchone()[0]
+
+    conn.commit()
+    conn.close()
+
+    return conversation_id
+def add_message(conversation_id: int, role: str, content: str):
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            INSERT INTO messages (
+                conversation_id,
+                role,
+                content
+            )
+            VALUES (%s, %s, %s)
+            RETURNING id
+            """,
+            (
+                conversation_id,
+                role,
+                content
+            )
+        )
+
+        message_id = cursor.fetchone()[0]
+
+    conn.commit()
+    conn.close()
+
+    return message_id
+def get_messages(conversation_id: int):
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT
+                id,
+                role,
+                content,
+                created_at
+            FROM messages
+            WHERE conversation_id = %s
+            ORDER BY created_at ASC, id ASC
+            """,
+            (conversation_id,)
+        )
+
+        messages = cursor.fetchall()
+
+    conn.close()
+
+    return messages
 def delete_document(document_id: int):
     conn = get_connection()
 
@@ -133,9 +241,10 @@ def get_document_id(filename: str):
         return None
 
     return result[0]
-
 if __name__ == "__main__":
     create_documents_table()
     create_chunks_table()
+    create_conversations_table()
+    create_messages_table()
 
-    print("Documents and chunks tables created successfully")
+    print("All database tables created successfully")

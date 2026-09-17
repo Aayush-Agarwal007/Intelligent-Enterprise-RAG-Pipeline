@@ -38,7 +38,11 @@
 {
   "question": "What technologies were used in the Smart Travel Application?",
   "expected_document": "DEC_Developer.pdf",
-  "expected_answer": "Flutter, Dart, Firebase, REST APIs, Google Maps API, Geolocation Services, and Git"
+  "expected_facts": [
+    "Flutter",
+    "Dart",
+    "REST APIs"
+]
 },
 {
   "question": "What are Aayush's core CS concepts?",

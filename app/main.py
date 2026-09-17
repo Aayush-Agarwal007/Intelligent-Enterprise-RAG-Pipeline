@@ -1,6 +1,7 @@
 from unittest import result
-
+from app.rag.keyword_search import rebuild_bm25_index
 from fastapi import FastAPI
+from app.db.database import get_messages,add_message
 from app.api.documents import router as documents_router
 from app.rag.retrieval import hybrid_search, retrieve_with_reranking
 from app.rag.generation import generate_answer
@@ -11,6 +12,10 @@ app = FastAPI(
     description="AI-Powered Enterprise Knowledge Assistant",
     version="1.0.0"
 )
+@app.on_event("startup")
+def startup_event():
+    rebuild_bm25_index()
+    print("BM25 index rebuilt from PostgreSQL")
 app.include_router(documents_router)
 
 
@@ -23,12 +28,24 @@ def health_check():
 
 
 @app.get("/ask")
-def ask_ai(question: str):
+def ask_ai(question: str, conversation_id: int):
+        # Load previous conversation messages
+    previous_messages = get_messages(conversation_id)
+
+    print("\n========== CONVERSATION HISTORY ==========")
+
+    for message in previous_messages:
+        print(
+            "Role:", message[1],
+            "| Content:", message[2]
+        )
+
+    print("==========================================\n")
 
     # 1. Retrieve relevant documents
     results = retrieve_with_reranking(
         question,
-        limit=5
+        limit=10
     )
     keyword_results = keyword_search(
     question,
@@ -71,12 +88,26 @@ Page: {payload["page"]}
 )       
 
     context = "\n\n".join(context_parts)
-
+    print("\n================ CONTEXT SENT TO LLM ================\n")
+    print(context)
+    print("\n=======================================================\n")
     # 4. Generate answer
     answer = generate_answer(
         question,
         context
     )
+    # Save user question and AI answer
+    add_message(
+        conversation_id,
+        "user",
+        question
+)
+
+    add_message(
+        conversation_id,
+        "assistant",
+        answer
+)
 
     # 5. Build sources
     sources = []

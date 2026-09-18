@@ -5,7 +5,7 @@ from app.db.database import get_messages,add_message
 from app.db.database import create_conversation
 from app.api.documents import router as documents_router
 from app.rag.retrieval import hybrid_search, retrieve_with_reranking
-from app.rag.generation import generate_answer
+from app.rag.generation import generate_answer,rewrite_question 
 from app.rag.keyword_search import keyword_search
 from app.rag.reranker import rerank_documents
 app = FastAPI(
@@ -35,6 +35,23 @@ def create_new_conversation():
         "conversation_id": conversation_id,
         "title": "New Conversation"
     }
+@app.get("/conversations/{conversation_id}/messages")
+def get_conversation_messages(conversation_id: int):
+
+    messages = get_messages(conversation_id)
+
+    return {
+        "conversation_id": conversation_id,
+        "messages": [
+            {
+                "id": message[0],
+                "role": message[1],
+                "content": message[2],
+                "created_at": message[3]
+            }
+            for message in messages
+        ]
+    }
 @app.get("/ask")
 def ask_ai(question: str, conversation_id: int):
         # Load previous conversation messages
@@ -55,12 +72,22 @@ def ask_ai(question: str, conversation_id: int):
     print("==========================================\n")
 
     # 1. Retrieve relevant documents
-    results = retrieve_with_reranking(
+    # 1. Rewrite question using conversation history
+    search_question = rewrite_question(
         question,
+        conversation_history
+)
+
+    print("\nOriginal question:", question)
+    print("Search question:", search_question)
+
+# 2. Retrieve relevant documents
+    results = retrieve_with_reranking(
+        search_question,
         limit=10
-    )
+)
     keyword_results = keyword_search(
-    question,
+    search_question,
     limit=7
 )
 

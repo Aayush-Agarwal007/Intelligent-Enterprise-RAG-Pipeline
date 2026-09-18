@@ -1,7 +1,13 @@
 # from unittest import result
 from app.rag.keyword_search import rebuild_bm25_index
 from fastapi import FastAPI
-from app.db.database import get_messages,add_message
+# from app.db.database import get_messages,add_message,get_conversations
+from app.db.database import (
+    get_messages,
+    add_message,
+    get_conversations,
+    delete_conversation
+)
 from app.db.database import create_conversation
 from app.api.documents import router as documents_router
 from app.rag.retrieval import hybrid_search, retrieve_with_reranking
@@ -26,6 +32,20 @@ def health_check():
         "status": "OK",
         "message": "Enterprise Knowledge Intelligence System is running smoothly"
     }
+@app.get("/conversations")
+def list_conversations():
+    conversations = get_conversations()
+
+    return {
+        "conversations": [
+            {
+                "id": conversation[0],
+                "title": conversation[1],
+                "created_at": conversation[2]
+            }
+            for conversation in conversations
+        ]
+    }  
 
 @app.post("/conversations")
 def create_new_conversation():
@@ -51,6 +71,20 @@ def get_conversation_messages(conversation_id: int):
             }
             for message in messages
         ]
+    }
+@app.delete("/conversations/{conversation_id}")
+def remove_conversation(conversation_id: int):
+
+    deleted = delete_conversation(conversation_id)
+
+    if deleted == 0:
+        return {
+            "message": "Conversation not found"
+        }
+
+    return {
+        "message": "Conversation deleted successfully",
+        "conversation_id": conversation_id
     }
 @app.get("/ask")
 def ask_ai(question: str, conversation_id: int):

@@ -1,7 +1,16 @@
 # from unittest import result
 from app.rag.keyword_search import rebuild_bm25_index
+# from fastapi import FastAPI
 from fastapi import FastAPI
-# from app.db.database import get_messages,add_message,get_conversations
+from fastapi.middleware.cors import CORSMiddleware
+
+# from app.db.database import get_messages,add_message,get_conversation
+from app.db.database import (
+    get_messages,
+    add_message,
+    create_conversation,
+    update_conversation_title
+)
 from app.db.database import (
     get_messages,
     add_message,
@@ -18,6 +27,16 @@ app = FastAPI(
     title="Enterprise Knowledge Intelligence System",
     description="AI-Powered Enterprise Knowledge Assistant",
     version="1.0.0"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 @app.on_event("startup")
 def startup_event():
@@ -182,6 +201,22 @@ Page: {payload["page"]}
         "assistant",
         answer
 )
+    # Update conversation title using the first user question
+    previous_user_messages = [
+        message for message in previous_messages
+        if message[1] == "user"
+]
+
+    if len(previous_user_messages) == 0:
+        title = question.strip()
+
+        if len(title) > 40:
+            title = title[:40].rstrip() + "..."
+
+        update_conversation_title(
+            conversation_id,
+            title
+    )
 
     # 5. Build sources
     sources = []
@@ -206,9 +241,10 @@ Page: {payload["page"]}
             "document": document,
             "page": page,
             "score": score
-    })
+        })
+
     return {
         "question": question,
         "answer": answer,
         "sources": sources
-}
+    }

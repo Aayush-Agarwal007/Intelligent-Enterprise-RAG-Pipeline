@@ -357,6 +357,21 @@ def create_conversations_table():
 
     conn.commit()
     conn.close()
+def update_conversation_title(conversation_id: int, title: str):
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(
+            """
+            UPDATE conversations
+            SET title = %s
+            WHERE id = %s
+            """,
+            (title, conversation_id)
+        )
+
+    conn.commit()
+    conn.close()   
 def create_messages_table():
     conn = get_connection()
 

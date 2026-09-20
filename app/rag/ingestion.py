@@ -18,7 +18,7 @@ COLLECTION_NAME = "enterprise_documents"
 
 
 qdrant_client = QdrantClient(
-    url="http://127.0.0.1:6333"
+    url=QDRANT_URL
 )
 
 

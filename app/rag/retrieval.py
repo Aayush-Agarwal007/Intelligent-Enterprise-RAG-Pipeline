@@ -1,5 +1,6 @@
 from qdrant_client import QdrantClient
-from ollama import embed
+from ollama import Client
+ollama_client = Client(host="http://host.docker.internal:11434")
 from app.rag.reranker import rerank_documents
 
 from app.rag.keyword_search import keyword_search
@@ -15,7 +16,7 @@ COLLECTION_NAME = "enterprise_documents"
 def search_documents(question: str, limit: int = 7):
 
     # Convert question into embedding
-    response = embed(
+    response = ollama_client.embed(
         model="nomic-embed-text",
         input=question
     )

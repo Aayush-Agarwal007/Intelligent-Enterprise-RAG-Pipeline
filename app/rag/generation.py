@@ -1,5 +1,5 @@
-from ollama import chat
-
+from ollama import Client
+ollama_client = Client(host="http://host.docker.internal:11434")
 
 MODEL_NAME = "qwen2.5:3b"
 
@@ -40,7 +40,7 @@ USER QUESTION:
 ANSWER:
 """
 
-    response = chat(
+    response = ollama_client.chat(
         model=MODEL_NAME,
         messages=[
             {
@@ -82,7 +82,7 @@ LATEST USER QUESTION:
 STANDALONE SEARCH QUERY:
 """
 
-    response = chat(
+    response = ollama_client.chat(
         model=MODEL_NAME,
         messages=[
             {

@@ -7,6 +7,10 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
 
 from ollama import embed
+import os
+from ollama import Client
+
+ollama_client = Client(host="http://host.docker.internal:11434")
 
 
 QDRANT_URL = "http://qdrant:6333"
@@ -71,10 +75,10 @@ def store_chunks_in_qdrant(chunks, document_name):
 
     for index, chunk in enumerate(chunks):
 
-        response = embed(
+        response = ollama_client.embed(
             model="nomic-embed-text",
-            input=chunk["text"]
-        )
+             input=chunk["text"]
+)
 
         embedding = response["embeddings"][0]
 

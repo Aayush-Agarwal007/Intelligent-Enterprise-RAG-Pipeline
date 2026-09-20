@@ -245,8 +245,8 @@ import psycopg
 
 
 DATABASE_URL = (
-    "host=127.0.0.1 "
-    "port=5540 "
+    "host=enterprise-postgres "
+    "port=5432 "
     "dbname=enterprise_ai "
     "user=enterprise "
     "password=enterprise123"

@@ -6,7 +6,7 @@ from app.rag.keyword_search import keyword_search
 
 
 qdrant_client = QdrantClient(
-    url="http://127.0.0.1:6333"
+    url="http://qdrant:6333"
 )
 
 COLLECTION_NAME = "enterprise_documents"

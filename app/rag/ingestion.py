@@ -9,7 +9,7 @@ from qdrant_client.models import PointStruct
 from ollama import embed
 
 
-QDRANT_URL = "http://127.0.0.1:6333"
+QDRANT_URL = "http://qdrant:6333"
 COLLECTION_NAME = "enterprise_documents"
 
 

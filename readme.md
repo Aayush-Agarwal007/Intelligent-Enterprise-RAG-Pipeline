@@ -395,6 +395,6 @@ This project provides practical experience with:
 
 ------------------------------------------------------------------------
 
-**Author:** Aayush Mittal\
+**Author:** @Aayush Agarwal\
 **Repository:**
 [Intelligent-Enterprise-RAG-Pipeline](https://github.com/Aayush-Agarwal007/Intelligent-Enterprise-RAG-Pipeline)
